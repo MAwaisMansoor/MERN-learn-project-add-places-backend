@@ -1,0 +1,9 @@
+{
+    "env": {
+        "DB_USER": "awais_1",
+        "DB_PASSWORD": "donlyawais",
+        "DB_NAME": "mern-learn",
+        "GOOGLE_API_KEY": "Sadly, need credit card for Google Api Key",
+        "JWT_KEY": "superSecretKey_PleaseDontShare"
+    }
+}

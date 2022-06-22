@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -10,6 +13,18 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+    next();
+});
+
 app.use('/api/places', placesRoutes); // => /api/places
 app.use('/api/users', usersRoutes); // => /api/users
 
@@ -20,6 +35,12 @@ app.use((req, res, next) => {
 //express error handling
 //only comes atthis if error occurs
 app.use((error, req, res, next) => {
+    if (req.file) {
+        fs.unlink(req.file.path, err => {
+            console.log(err);
+        });
+    }
+
     //if somehow responce is sent
     if (res.headerSent) {
         return next(error);
@@ -31,7 +52,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-    .connect('mongodb+srv://awais_1:donlyawais@cluster0.bkx35.mongodb.net/mern-learn?retryWrites=true&w=majority')
+    .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.bkx35.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
     .then(() => {
         app.listen(5000);
     })
